@@ -1,12 +1,12 @@
 ---
 
 # When overriding a version, also set its archive checksum for the target architecture.
-zsh_starship_version: '1.24.2'
+zsh_starship_version: '1.27.0'
 zsh_starship_sha256:
-  x86_64: 00ff3c1f8ffb59b5c15d4b44c076bcca04d92cf0055c86b916248c14f3ae714a
-  aarch64: 56b9ff412bbf374d29b99e5ac09a849124cb37a0a13121e8470df32de53c1ea6
+  x86_64: 10c8eb4cb3b761d9bf59ea828444c2dab36c900b7d69a69e08814b286969df89
+  aarch64: 341f5cbf24699fa0b27ec88965ad25f862ea09e15d35a543fd6ffdff1d2aa00d
 
-zsh_fzf_version: '0.68.0'
+zsh_fzf_version: '0.75.0'
 zsh_fzf_sha256:
-  x86_64: 545004a69eb65bb9adf32000971105ac21aea54bbecb618c55414d21b823fe95
-  aarch64: dad9cc3b617305d504dbbf8812c4c9970a6dc7efdce9b5eacbd130d1f1dbc05d
+  x86_64: 0d6640f83582d991cf429754baad64b07e3a4e439a6019670f4b91da1314141c
+  aarch64: bd0717badb6a5620387e014bb94209aac4d9eab6ab77b5348eabb0833aeb4d59

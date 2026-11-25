@@ -50,9 +50,9 @@ Set these in inventory or play variables to override the release defaults:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `zsh_starship_version` | `1.24.2` | Starship release to install. |
+| `zsh_starship_version` | `1.27.0` | Starship release to install. |
 | `zsh_starship_sha256` | See [role defaults](defaults/main.yml) | Starship archive SHA-256 checksums keyed by `x86_64` and `aarch64`. |
-| `zsh_fzf_version` | `0.68.0` | fzf release to install. |
+| `zsh_fzf_version` | `0.75.0` | fzf release to install. |
 | `zsh_fzf_sha256` | See [role defaults](defaults/main.yml) | fzf archive SHA-256 checksums keyed by `x86_64` and `aarch64`. |
 
-When overriding a version, also supply the matching archive checksum for each target architecture. The role uses these values when installing a missing binary and reuses executables already present at `/usr/local/bin/starship` and `/usr/local/share/fzf/bin/fzf`.
+When overriding a version, also supply the matching archive checksum for each target architecture. The role installs a binary if it is missing or its `--version` command fails, and reuses binaries that run successfully.

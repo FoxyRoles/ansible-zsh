@@ -7,9 +7,19 @@
     get_checksum: false
   register: zsh_binary_stat
 
+- name: Check whether {{ zsh_binary.name }} runs on the target
+  ansible.builtin.command:
+    argv:
+      - "{{ zsh_binary.directory }}/{{ zsh_binary.name }}"
+      - --version
+  register: zsh_binary_version
+  changed_when: false
+  failed_when: false
+  when: zsh_binary_stat.stat.executable | default(false)
+
 - name: Install {{ zsh_binary.name }}
   when:
-    - not zsh_binary_stat.stat.executable | default(false)
+    - zsh_binary_version.rc | default(1) != 0
     - not ansible_check_mode
   block:
     - name: Create a temporary directory for {{ zsh_binary.name }}
