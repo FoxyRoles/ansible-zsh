@@ -1,0 +1,64 @@
+# ------------------------------------
+# Globální zinit + starship konfigurace
+# ------------------------------------
+
+# Zinit - plugin manager
+ZINIT_HOME="/usr/local/share/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
+
+# Pluginy (lazy-loaded)
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+
+#zstyle :omz:plugins:ssh-agent identities id_ed25519
+#zstyle :omz:plugins:ssh-agent lifetime 4h
+#zstyle :omz:plugins:ssh-agent quiet yes
+#zinit snippet OMZP::ssh-agent
+
+zinit snippet OMZP::sudo
+zinit snippet OMZP::extract
+zinit snippet OMZP::command-not-found
+
+# Navigace
+setopt AUTO_CD              # napíšeš název adresáře → cd do něj
+setopt AUTO_PUSHD           # každý cd pushne do zásobníku
+setopt PUSHD_IGNORE_DUPS    # bez duplicit v zásobníku
+setopt CDABLE_VARS          # cd do proměnné bez $
+
+# Globbing (pattern matching)
+setopt EXTENDED_GLOB        # rozšířené patterny: ^, ~, #
+setopt GLOB_DOTS            # matche i skryté soubory (.env, .git)
+setopt NULL_GLOB            # pattern bez výsledku → prázdný řetězec místo chyby
+
+# Korekce
+setopt CORRECT              # nabídne opravu překlepů v příkazech
+setopt CORRECT_ALL          # i v argumentech
+
+# Historie
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_REDUCE_BLANKS   # odstraní zbytečné mezery
+setopt HIST_IGNORE_SPACE    # vynechá příkaz začínající z historie
+setopt SHARE_HISTORY        # sdílená mezi sessions
+setopt INC_APPEND_HISTORY   # zapisuje průběžně, ne až při exitu
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY        # sdílená historie mezi sessions
+
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE="${HOME}/.zsh_history"
+
+# Lepší klávesové zkratky pro historii
+bindkey '^[[A' history-search-backward   # šipka nahoru
+bindkey '^[[B' history-search-forward     # šipka dolů
+
+# compinit
+if (( $+functions[zicompinit] )); then zicompinit && zicdreplay; fi
+
+# Setup fzf
+path=( /usr/local/share/fzf/bin "${(@)path:#/usr/local/share/fzf/bin}" )
+source <(fzf --zsh)
+
+# Starship prompt
+export STARSHIP_CONFIG="/etc/starship/starship.toml"
+eval "$(starship init zsh)"

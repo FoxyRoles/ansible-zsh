@@ -1,0 +1,49 @@
+---
+
+- name: Check whether {{ zsh_binary.name }} is installed
+  ansible.builtin.stat:
+    path: "{{ zsh_binary.directory }}/{{ zsh_binary.name }}"
+    follow: true
+    get_checksum: false
+  register: zsh_binary_stat
+
+- name: Install {{ zsh_binary.name }}
+  when:
+    - not zsh_binary_stat.stat.executable | default(false)
+    - not ansible_check_mode
+  block:
+    - name: Create a temporary directory for {{ zsh_binary.name }}
+      ansible.builtin.tempfile:
+        state: directory
+      register: zsh_binary_tmp
+
+    - name: Download and verify {{ zsh_binary.name }} archive
+      ansible.builtin.get_url:
+        url: "{{ zsh_binary.url }}"
+        dest: "{{ zsh_binary_tmp.path }}/release.tar.gz"
+        checksum: "sha256:{{ zsh_binary.sha256 }}"
+        mode: '0600'
+
+    - name: Extract {{ zsh_binary.name }}
+      ansible.builtin.unarchive:
+        src: "{{ zsh_binary_tmp.path }}/release.tar.gz"
+        dest: "{{ zsh_binary_tmp.path }}"
+        include:
+          - "{{ zsh_binary.name }}"
+        remote_src: true
+
+    - name: Install {{ zsh_binary.name }} binary
+      ansible.builtin.copy:
+        src: "{{ zsh_binary_tmp.path }}/{{ zsh_binary.name }}"
+        dest: "{{ zsh_binary.directory }}/{{ zsh_binary.name }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0755'
+
+  always:
+    - name: Remove temporary files for {{ zsh_binary.name }}
+      ansible.builtin.file:
+        path: "{{ zsh_binary_tmp.path }}"
+        state: absent
+      when: zsh_binary_tmp.path is defined

@@ -1,0 +1,109 @@
+---
+
+- name: Configure the system Zsh environment
+  block:
+    - name: Check the supported platform
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == 'Debian'
+          - ansible_facts['architecture'] in zsh_fzf_architectures
+        fail_msg: This role requires a Debian-family system on x86_64 or aarch64.
+
+    - name: Install Zsh and plugin dependencies
+      ansible.builtin.apt:
+        name:
+          - zsh
+          - bzip2
+          - ca-certificates
+          - command-not-found
+          - curl
+          - git
+          - sudo
+          - unzip
+          - xz-utils
+          - zstd
+        state: present
+        cache_valid_time: 3600
+
+    - name: Check the command-not-found database
+      ansible.builtin.stat:
+        path: /var/lib/command-not-found/commands.db
+        get_checksum: false
+      register: zsh_command_not_found_db
+
+    - name: Refresh APT indexes to initialize command-not-found suggestions
+      ansible.builtin.apt:
+        update_cache: true
+      when: zsh_command_not_found_db.stat.size | default(0) == 0
+
+    - name: Check whether Zinit is installed
+      ansible.builtin.stat:
+        path: /usr/local/share/zinit/zinit.git/zinit.zsh
+      register: zsh_zinit_script
+
+    - name: Install Zinit
+      ansible.builtin.git:
+        repo: https://github.com/zdharma-continuum/zinit.git
+        dest: /usr/local/share/zinit/zinit.git
+        version: 87a8e6b0d63aeb088bbb15b38b530e7e364296cb
+        update: false
+      when:
+        - not zsh_zinit_script.stat.exists
+        - not ansible_check_mode
+
+    - name: Create configuration and binary directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - /etc/starship
+        - /usr/local/bin
+        - /usr/local/share/fzf/bin
+
+    - name: Install Starship and fzf release binaries
+      ansible.builtin.include_tasks: install-binary.yml
+      loop:
+        - name: starship
+          directory: /usr/local/bin
+          url: "https://github.com/starship/starship/releases/download/v{{ zsh_starship_version }}/starship-{{ ansible_facts['architecture'] }}-unknown-linux-musl.tar.gz"
+          sha256: "{{ zsh_starship_sha256[ansible_facts['architecture']] }}"
+        - name: fzf
+          directory: /usr/local/share/fzf/bin
+          url: "https://github.com/junegunn/fzf/releases/download/v{{ zsh_fzf_version }}/fzf-{{ zsh_fzf_version }}-linux_{{ zsh_fzf_architectures[ansible_facts['architecture']] }}.tar.gz"
+          sha256: "{{ zsh_fzf_sha256[ansible_facts['architecture']] }}"
+      loop_control:
+        loop_var: zsh_binary
+        label: "{{ zsh_binary.name }}"
+
+    - name: Deploy Zsh and Starship configuration
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - src: zshrc.local
+          dest: /etc/zsh/zshrc.local
+        - src: starship.toml
+          dest: /etc/starship/starship.toml
+        - src: skel.zshenv
+          dest: /etc/skel/.zshenv
+        - src: skel.zshrc
+          dest: /etc/skel/.zshrc
+
+    - name: Load the system-wide local Zsh configuration
+      ansible.builtin.lineinfile:
+        path: /etc/zsh/zshrc
+        create: true
+        mode: '0644'
+        line: '[[ -f /etc/zsh/zshrc.local ]] && source /etc/zsh/zshrc.local'
+        validate: /usr/bin/zsh -n %s
+
+    - name: Set the root login shell to Zsh
+      ansible.builtin.user:
+        name: root
+        shell: /usr/bin/zsh

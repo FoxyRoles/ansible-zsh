@@ -1,0 +1,28 @@
+---
+
+galaxy_info:
+  namespace: sunfoxcz
+  role_name: zsh
+  author: Tomas Jacik
+  description: Install and configure Zsh with Starship, Zinit, and fzf on Debian and Ubuntu.
+  company: sunfoxcz
+  license: MIT
+  min_ansible_version: '2.15'
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - trixie
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+        - resolute
+  galaxy_tags:
+    - zsh
+    - shell
+    - starship
+    - zinit
+    - fzf
+
+dependencies: []
