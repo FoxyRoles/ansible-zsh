@@ -4,8 +4,8 @@ An Ansible role that installs Zsh, Starship, Zinit, and fzf and sets `/usr/bin/z
 
 ## Requirements
 
-- Ansible Core 2.15 or later, with fact gathering enabled.
-- Debian (Bookworm or Trixie) or Ubuntu (Jammy, Noble, or Resolute) on `amd64` or `arm64`.
+- `ansible-core` 2.19 or newer, with fact gathering enabled.
+- Debian (Bookworm or Trixie) or Ubuntu (Focal, Jammy, Noble, Resolute) on `amd64` or `arm64`.
 - Root privileges and access to APT repositories and GitHub from the managed host.
 
 ## Installation

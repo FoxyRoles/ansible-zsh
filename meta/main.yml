@@ -7,7 +7,7 @@ galaxy_info:
   description: Install and configure Zsh with Starship, Zinit, and fzf on Debian and Ubuntu.
   company: sunfoxcz
   license: MIT
-  min_ansible_version: '2.15'
+  min_ansible_version: '2.19'
   platforms:
     - name: Debian
       versions:
@@ -15,6 +15,7 @@ galaxy_info:
         - trixie
     - name: Ubuntu
       versions:
+        - focal
         - jammy
         - noble
         - resolute
